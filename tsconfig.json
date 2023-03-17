@@ -9,7 +9,7 @@
 		"jsxFragmentFactory": "Fragment",
 		"noEmit": true,
 		"allowJs": true,
-		"checkJs": true,
+		"checkJs": false,
 		"skipLibCheck": true,
 		"baseUrl": "./",
 		"paths": {

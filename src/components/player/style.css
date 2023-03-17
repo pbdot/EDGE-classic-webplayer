@@ -1,0 +1,18 @@
+
+.player {
+	display: flex;
+	width: 100%;	
+}
+
+.edgeclassic {
+	display: flex;
+	width: 100%;		
+}
+
+canvas {
+	display: flex;	
+	width:100%;			
+	aspect-ratio: 16/9;
+}
+
+
