@@ -215,6 +215,13 @@ const EdgeClassic = () => {
 				console.log("Post-Init!");
 				setState({ ...state, loading: false });
 			},
+			onFullscreen: () => {
+				console.log("On fullscreen");
+				const elements = document.querySelectorAll(".playercontrols");
+				elements?.forEach(e => {					
+					(e as any).style.display = "flex";
+				});
+			},
 			preEdgeSyncFS: () => {
 			},
 			postEdgeSyncFS: () => {
@@ -241,6 +248,9 @@ const EdgeClassic = () => {
 		}).then(module => {
 			globalThis.Module = module;
 			module.canvas = canvas;
+			canvas.addEventListener("click", async () => {
+				await canvas.requestPointerLock();
+			});
 		});
 
 
@@ -253,8 +263,18 @@ const EdgeClassic = () => {
 
 	// 56.25% 16:9
 	return <div class={style.edgeclassic}>
-		<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: "top", alignItems: "center"}}>
-				<canvas id="canvas" />
+		<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: "top", alignItems: "center" }}>
+			<canvas id="canvas" />
+		</div>
+	</div>
+}
+
+const PlayerControls = () => {
+	const [fullscreen, setFullscreen] = useState(false);
+	return <div className="playercontrols" style={{ display:"flex", width: "100%", padding: "24px", zIndex: 1, position: "absolute" }}>
+		<div className="playercontrols" style={{ display:"flex", width: "100%" }} />
+		<div className="playercontrols" style={{ display:"flex", flexShrink: 1, paddingRight: "48px"}}>
+			<button style={{ opacity: 1 }} className="playercontrols" onClick={() => { Module._I_WebSetFullscreen(fullscreen ? 0 : 1, setFullscreen(!fullscreen)) }}>{fullscreen ? "Exit Fullscreen" : "Fullscreen"}</button>
 		</div>
 	</div>
 }
@@ -269,7 +289,11 @@ const Player = () => {
 	return (
 		<div class={style.player}>
 			{!wadState.wadName && <WadChooser />}
-			{!!wadState.wadName && <EdgeClassic />}
+			{!!wadState.wadName &&
+				<div style={{ display: "flex", width: "100%", height: "100%", flexFlow: "column", position: "relative" }}>
+					<EdgeClassic />
+					<PlayerControls />
+				</div>}
 		</div>
 	);
 };
