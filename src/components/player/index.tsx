@@ -173,49 +173,61 @@ const WadChooser = () => {
 
 	return <div style={{ display: "flex", width: "100%", padding: 24 }}>
 		<div style={{ display: "flex", flexGrow: 1 }}>
-			<div style={{ display: "flex", width: "100%" }}>
+			<div style={{ display: "flex", width: "50%" }}>
 				<div style={{ display: "flex", flexDirection: "column" }}>
-					<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-						<button style="font-size:24px;padding:12px" onClick={() => {
+
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<button style="font-size:24px;width:100%;padding:12px" onClick={() => {
 							WadHandler.singleton.setWad(defaultIWad, true)
-						}}>Play Freedoom</button>
-						<button style="font-size:24px;padding:12px" onClick={() => document.getElementById('getWadFile').click()}>Choose Wad</button>
-						<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
-							const files = (e.target as any).files as File[];
-							if (files.length !== 1) {
-								e.preventDefault();
-								alert("Please select a single wad file");
-								return;
-							}
-
-							const file = files[0];
-							if (!file.name.toLowerCase().endsWith(".wad")) {
-								e.preventDefault();
-								alert("Please select a single wad file");
-								return;
-							}
-
-							const wadHandler = WadHandler.singleton;
-							wadHandler.uploadWad(file);
-
-						}} />
+						}}>Play Freedoom</button>						
+						<div style={{ display: "flex" }}>
+							{`EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.`}
+						</div>
 					</div>
-					<div style={{ display: "flex", flexShrink: 1 }}>
-						EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.
+
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<button style="font-size:24px;width:100%;padding:12px" onClick={() => {
+							document.getElementById('getWadFile').click()
+						}}>Choose Wad</button>
+						<div style={{ display: "flex" }}>
+							{`EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.`}
+						</div>
 					</div>
+
 				</div>
+
+				<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
+					const files = (e.target as any).files as File[];
+					if (files.length !== 1) {
+						e.preventDefault();
+						alert("Please select a single wad file");
+						return;
+					}
+
+					const file = files[0];
+					if (!file.name.toLowerCase().endsWith(".wad")) {
+						e.preventDefault();
+						alert("Please select a single wad file");
+						return;
+					}
+
+					const wadHandler = WadHandler.singleton;
+					wadHandler.uploadWad(file);
+
+				}} />
 			</div>
-
-			<div style={{ display: "flex", flexGrow: 0, width: "33%", flexDirection: "column" }}>
-				<div style={{ display: "flex", flex: "0 0 24px", position: "relative" }}>
-					<div style={{ position: "absolute", fontSize: 20, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
-				</div>
-				<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column" }}>
-					{pelements}
-				</div>
+		</div>
+		<div style={{ display: "flex", width: "20%" }} />
+		<div style={{ display: "flex", flexGrow: 1, width: "30%", flexDirection: "column" }}>
+			<div style={{ display: "flex", flex: "0 0 24px", position: "relative" }}>
+				<div style={{ position: "absolute", fontSize: 20, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
+			</div>
+			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column" }}>
+				{pelements}
 			</div>
 		</div>
 	</div>
+
 }
 
 
