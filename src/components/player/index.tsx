@@ -143,37 +143,77 @@ class WadHandler {
 	private static instance?: WadHandler;
 }
 
+type Project = {
+	name: string;
+	image: string;
+	link: string;
+}
+
+const projects: Project[] = [
+
+	{ name: "Operation: Arctic Wolf Revisited", image: "../../assets/images/articwolf.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/arctic-wolf-revisited" },
+	{ name: "Astral Pathfinder", image: "../../assets/images/astralpathfinder.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/astral-pathfinder1" },
+	{ name: "Aliens: Stranded", image: "../../assets/images/aliensstranded.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/aliens-stranded" }
+]
+
 const WadChooser = () => {
 
-	return <div>
-		<div style="padding:64px">
-			<div style="text-align:center;">
-				<button style="font-size:24px;padding:12px" onClick={() => {
-					WadHandler.singleton.setWad(defaultIWad, true)
-				}}>Play Freedoom</button>
+	const pelements = projects.map(p => {
+		return <a href={p.link} target="_blank" style="display:flex;flex:1;flex-direction:column;height:100%;align-items:flex-end;">
+			<div style={{ display: "flex", flex: 0 }}>
+				<div style={{ paddingTop: 12, paddingBottom: 4, fontSize: 14, whiteSpace: "pre" }}>{p.name}</div>
 			</div>
-			<div style="text-align:center;margin-top:24px">
-				<button style="font-size:24px;padding:12px" onClick={() => document.getElementById('getWadFile').click()}>Choose Wad</button>
+			<div style={{ display: "flex", position: "relative", flexGrow: 1, width: "100%" }} >
+				<img style="width:100%;height:100%; object-fit:cover;position:absolute;top:0;left:0" src={p.image} />
 			</div>
-			<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
-				const files = (e.target as any).files as File[];
-				if (files.length !== 1) {
-					e.preventDefault();
-					alert("Please select a single wad file");
-					return;
-				}
+		</a>
 
-				const file = files[0];
-				if (!file.name.toLowerCase().endsWith(".wad")) {
-					e.preventDefault();
-					alert("Please select a single wad file");
-					return;
-				}
+		//
+	});
 
-				const wadHandler = WadHandler.singleton;
-				wadHandler.uploadWad(file);
+	return <div style={{ display: "flex", width: "100%", padding: 24 }}>
+		<div style={{ display: "flex", flexGrow: 1 }}>
+			<div style={{ display: "flex", width: "100%" }}>
+				<div style={{ display: "flex", flexDirection: "column" }}>
+					<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+						<button style="font-size:24px;padding:12px" onClick={() => {
+							WadHandler.singleton.setWad(defaultIWad, true)
+						}}>Play Freedoom</button>
+						<button style="font-size:24px;padding:12px" onClick={() => document.getElementById('getWadFile').click()}>Choose Wad</button>
+						<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
+							const files = (e.target as any).files as File[];
+							if (files.length !== 1) {
+								e.preventDefault();
+								alert("Please select a single wad file");
+								return;
+							}
 
-			}} />
+							const file = files[0];
+							if (!file.name.toLowerCase().endsWith(".wad")) {
+								e.preventDefault();
+								alert("Please select a single wad file");
+								return;
+							}
+
+							const wadHandler = WadHandler.singleton;
+							wadHandler.uploadWad(file);
+
+						}} />
+					</div>
+					<div style={{ display: "flex", flexShrink: 1 }}>
+						EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.
+					</div>
+				</div>
+			</div>
+
+			<div style={{ display: "flex", flexGrow: 0, width: "33%", flexDirection: "column" }}>
+				<div style={{ display: "flex", flex: "0 0 24px", position: "relative" }}>
+					<div style={{ position: "absolute", fontSize: 20, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
+				</div>
+				<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column" }}>
+					{pelements}
+				</div>
+			</div>
 		</div>
 	</div>
 }
@@ -218,7 +258,7 @@ const EdgeClassic = () => {
 			onFullscreen: () => {
 				console.log("On fullscreen");
 				const elements = document.querySelectorAll(".playercontrols");
-				elements?.forEach(e => {					
+				elements?.forEach(e => {
 					(e as any).style.display = "flex";
 				});
 			},
@@ -271,15 +311,13 @@ const EdgeClassic = () => {
 
 const PlayerControls = () => {
 	const [fullscreen, setFullscreen] = useState(false);
-	return <div className="playercontrols" style={{ display:"flex", width: "100%", padding: "24px", zIndex: 1, position: "absolute" }}>
-		<div className="playercontrols" style={{ display:"flex", width: "100%" }} />
-		<div className="playercontrols" style={{ display:"flex", flexShrink: 1, paddingRight: "48px"}}>
-			<button style={{ opacity: 1 }} className="playercontrols" onClick={() => { Module._I_WebSetFullscreen(fullscreen ? 0 : 1, setFullscreen(!fullscreen)) }}>{fullscreen ? "Exit Fullscreen" : "Fullscreen"}</button>
+	return <div className="playercontrols" style={{ display: "flex", width: "100%", padding: "24px", zIndex: 1, position: "absolute" }}>
+		<div className="playercontrols" style={{ display: "flex", width: "100%" }} />
+		<div className="playercontrols" style={{ display: "flex", flexShrink: 1, paddingRight: "48px" }}>
+			<button style={{ opacity: 1 }} className="playercontrols" onClick={() => { Module._I_WebSetFullscreen(fullscreen ? 0 : 1, setFullscreen(!fullscreen)) }}>{fullscreen ? "Minimize" : "Maximize"}</button>
 		</div>
 	</div>
 }
-
-//<div style={{ display: "flex", width: "100%", flex: "1 0 5%" }} />
 
 const Player = () => {
 

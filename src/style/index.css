@@ -37,3 +37,8 @@ main {
 	height: 100%;	
 }
 
+a:-webkit-any-link {
+	color: #fff;
+	text-decoration: none
+}
+
