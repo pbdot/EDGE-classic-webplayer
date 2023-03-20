@@ -151,9 +151,9 @@ type Project = {
 
 const projects: Project[] = [
 
-	{ name: "Operation: Arctic Wolf Revisited", image: "../../assets/images/articwolf.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/arctic-wolf-revisited" },
-	{ name: "Astral Pathfinder", image: "../../assets/images/astralpathfinder.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/astral-pathfinder1" },
-	{ name: "Aliens: Stranded", image: "../../assets/images/aliensstranded.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/aliens-stranded" }
+	{ name: "Operation: Arctic Wolf Revisited", image: "./assets/images/articwolf.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/arctic-wolf-revisited" },
+	{ name: "Astral Pathfinder", image: "./assets/images/astralpathfinder.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/astral-pathfinder1" },
+	{ name: "Aliens: Stranded", image: "./assets/images/aliensstranded.png", link: "https://www.moddb.com/mods/edge-classic-add-ons/downloads/aliens-stranded" }
 ]
 
 const WadChooser = () => {
