@@ -312,22 +312,25 @@ const EdgeClassic = () => {
 	}, []);
 
 
-	return <div class={style.edgeclassic}>
-		<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: state.loading ? "center":"top", alignItems: "center", position: "relative" }}>
-			<canvas id="canvas" style={{ visibility: state.loading ? "hidden" : "visible" }} />
-			{!!state.loading && <div class={style.loading} style={{ position: "absolute" }}>
-				<span style="--i:1">L</span>
-				<span style="--i:2">O</span>
-				<span style="--i:3">A</span>
-				<span style="--i:4">D</span>
-				<span style="--i:5">I</span>
-				<span style="--i:6">N</span>
-				<span style="--i:7">G</span>
-				<span style="--i:8">.</span>
-				<span style="--i:9">.</span>
-				<span style="--i:10">.</span>
-			</div>}
+	return <div style={{ display: "flex", width: "100%", height: "100%", flexFlow: "column", position: "relative" }}>
+		<div class={style.edgeclassic}>
+			<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: state.loading ? "center" : "top", alignItems: "center", position: "relative" }}>
+				<canvas id="canvas" style={{ visibility: state.loading ? "hidden" : "visible" }} />
+				{!!state.loading && <div class={style.loading} style={{ position: "absolute" }}>
+					<span style="--i:1">L</span>
+					<span style="--i:2">O</span>
+					<span style="--i:3">A</span>
+					<span style="--i:4">D</span>
+					<span style="--i:5">I</span>
+					<span style="--i:6">N</span>
+					<span style="--i:7">G</span>
+					<span style="--i:8">.</span>
+					<span style="--i:9">.</span>
+					<span style="--i:10">.</span>
+				</div>}
+			</div>
 		</div>
+		{!state.loading && <PlayerControls />}
 	</div>
 }
 
@@ -349,11 +352,7 @@ const Player = () => {
 	return (
 		<div class={style.player}>
 			{!wadState.wadName && <WadChooser />}
-			{!!wadState.wadName &&
-				<div style={{ display: "flex", width: "100%", height: "100%", flexFlow: "column", position: "relative" }}>
-					<EdgeClassic />
-					<PlayerControls />
-				</div>}
+			{!!wadState.wadName && <EdgeClassic />}
 		</div>
 	);
 };
