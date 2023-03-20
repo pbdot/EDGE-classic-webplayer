@@ -171,7 +171,7 @@ const WadChooser = () => {
 		//
 	});
 
-	return <div style={{ display: "flex", width: "100%", padding: 24, paddingLeft: 42 }}>
+	return <div style={{ display: "flex", width: "100%", maxHeight: "1080px", padding: 24, paddingLeft: 42 }}>
 		<div style={{ display: "flex", flexGrow: 1 }}>
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
