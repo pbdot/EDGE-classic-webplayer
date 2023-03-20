@@ -176,9 +176,9 @@ const WadChooser = () => {
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
 					<div style={{ display: "flex" }}>
-						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24 }}>EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.						
-						<p>The latest release can be downloaded from <a href="https://edge-classic.github.io/index.html" target="_blank">https://edge-classic.github.io</a> </p>
-						<p>Play EDGE-Classic in your browser by selecting an option below:</p>
+						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24 }}>EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.
+							<p>The latest release can be downloaded from <a href="https://edge-classic.github.io/index.html" target="_blank">https://edge-classic.github.io</a> </p>
+							<p>Play EDGE-Classic in your browser by selecting an option below:</p>
 						</div>
 					</div>
 
@@ -187,7 +187,7 @@ const WadChooser = () => {
 							WadHandler.singleton.setWad(defaultIWad, true)
 						}}>Play Freedoom</button>
 					</div>
-					<div style={{paddingTop: 24}}/>
+					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
 						<button style="font-size:24px;width:256px;padding:12px" onClick={() => {
 							document.getElementById('getWadFile').click()
@@ -216,12 +216,12 @@ const WadChooser = () => {
 
 				}} />
 			</div>
-		</div>		
+		</div>
 		<div style={{ display: "flex", flexGrow: 1, width: "50%", flexDirection: "column" }}>
 			<div style={{ display: "flex", flex: "0 0 24px", position: "relative" }}>
 				<div style={{ position: "absolute", fontSize: 18, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
 			</div>
-			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column", justifyContent: "start"}}>
+			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column", justifyContent: "start" }}>
 				{pelements}
 			</div>
 		</div>
@@ -312,10 +312,21 @@ const EdgeClassic = () => {
 	}, []);
 
 
-	// 56.25% 16:9
 	return <div class={style.edgeclassic}>
-		<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: "top", alignItems: "center" }}>
-			<canvas id="canvas" />
+		<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: state.loading ? "center":"top", alignItems: "center", position: "relative" }}>
+			<canvas id="canvas" style={{ visibility: state.loading ? "hidden" : "visible" }} />
+			{!!state.loading && <div class={style.loading} style={{ position: "absolute" }}>
+				<span style="--i:1">L</span>
+				<span style="--i:2">O</span>
+				<span style="--i:3">A</span>
+				<span style="--i:4">D</span>
+				<span style="--i:5">I</span>
+				<span style="--i:6">N</span>
+				<span style="--i:7">G</span>
+				<span style="--i:8">.</span>
+				<span style="--i:9">.</span>
+				<span style="--i:10">.</span>
+			</div>}
 		</div>
 	</div>
 }
