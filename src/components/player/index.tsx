@@ -161,7 +161,7 @@ const WadChooser = () => {
 	const pelements = projects.map(p => {
 		return <a href={p.link} target="_blank" style="display:flex;flex:1;flex-direction:column;height:100%;align-items:flex-end;">
 			<div style={{ display: "flex", flex: 0 }}>
-				<div style={{ paddingTop: 12, paddingBottom: 4, fontSize: 14, whiteSpace: "pre" }}>{p.name}</div>
+				<div style={{ paddingTop: 12, paddingBottom: 4, fontSize: 14, whiteSpace: "pre", fontWeight: "normal" }}>{p.name}</div>
 			</div>
 			<div style={{ display: "flex", position: "relative", flexGrow: 1, width: "100%" }} >
 				<img style="width:100%;height:100%; object-fit:cover;position:absolute;top:0;left:0" src={p.image} />
@@ -171,27 +171,27 @@ const WadChooser = () => {
 		//
 	});
 
-	return <div style={{ display: "flex", width: "100%", padding: 24 }}>
+	return <div style={{ display: "flex", width: "100%", padding: 24, paddingLeft: 42 }}>
 		<div style={{ display: "flex", flexGrow: 1 }}>
-			<div style={{ display: "flex", width: "50%" }}>
-				<div style={{ display: "flex", flexDirection: "column" }}>
-
-					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:100%;padding:12px" onClick={() => {
-							WadHandler.singleton.setWad(defaultIWad, true)
-						}}>Play Freedoom</button>						
-						<div style={{ display: "flex" }}>
-							{`EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.`}
+			<div style={{ display: "flex", width: "80%" }}>
+				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
+					<div style={{ display: "flex" }}>
+						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24 }}>EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.						
+						<p>The latest release can be downloaded from <a href="https://edge-classic.github.io/index.html" target="_blank">https://edge-classic.github.io</a> </p>
+						<p>Play EDGE-Classic in your browser by selecting an option below:</p>
 						</div>
 					</div>
 
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:100%;padding:12px" onClick={() => {
+						<button style="font-size:24px;width:256px;padding:12px" onClick={() => {
+							WadHandler.singleton.setWad(defaultIWad, true)
+						}}>Play Freedoom</button>
+					</div>
+					<div style={{paddingTop: 24}}/>
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<button style="font-size:24px;width:256px;padding:12px" onClick={() => {
 							document.getElementById('getWadFile').click()
 						}}>Choose Wad</button>
-						<div style={{ display: "flex" }}>
-							{`EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.`}
-						</div>
 					</div>
 
 				</div>
@@ -216,13 +216,12 @@ const WadChooser = () => {
 
 				}} />
 			</div>
-		</div>
-		<div style={{ display: "flex", width: "20%" }} />
-		<div style={{ display: "flex", flexGrow: 1, width: "30%", flexDirection: "column" }}>
+		</div>		
+		<div style={{ display: "flex", flexGrow: 1, width: "50%", flexDirection: "column" }}>
 			<div style={{ display: "flex", flex: "0 0 24px", position: "relative" }}>
-				<div style={{ position: "absolute", fontSize: 20, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
+				<div style={{ position: "absolute", fontSize: 18, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
 			</div>
-			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column" }}>
+			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column", justifyContent: "start"}}>
 				{pelements}
 			</div>
 		</div>

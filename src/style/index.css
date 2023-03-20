@@ -37,8 +37,12 @@ main {
 	height: 100%;	
 }
 
-a:-webkit-any-link {
-	color: #fff;
-	text-decoration: none
+a, a:visited, a:active {
+    text-decoration: none;    
+	color: rgb(158, 194, 214);
 }
 
+a:hover {
+    
+    color: rgb(0, 162, 255);
+}
