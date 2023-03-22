@@ -164,9 +164,9 @@ const WadChooser = () => {
 				<div style={{ paddingTop: 12, paddingBottom: 4, fontSize: 14, whiteSpace: "pre", fontWeight: "normal" }}>{p.name}</div>
 			</div>
 			<div style={{ display: "flex", position: "relative", flexGrow: 1, width: "100%" }} >
-				<img style="width:100%;height:100%; object-fit:cover;position:scale-down;top:0;left:0" src={p.image} />
+				<img style="width:100%;height:100%;object-fit:cover;position:absolute" src={p.image} />
 			</div>
-		</a>		
+		</a>
 	});
 
 	return <div style={{ display: "flex", width: "100%", maxWidth: "1440px", padding: 24, paddingLeft: 42 }}>
@@ -239,22 +239,23 @@ const EdgeClassic = () => {
 		const wadName = wadState.wadName!;
 
 		const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
+		const canvasContainer = document.querySelector('#canvas-container') as HTMLDivElement;
 		if (!canvas) {
 			throw "Unable to get canvas";
 		}
 
-		const setCanvasSize = (c: HTMLCanvasElement, w:number, h: number) => {	
+		const setCanvasSize = (c: HTMLCanvasElement, w: number, h: number) => {
 			w = Math.floor(w);
 			h = Math.floor(h);
 			console.log("Setting canvas size", w, h);
 			c.style.width = `${w}px`;
 			c.style.height = `${h}px`;
 			c.width = w;
-			c.height = h;				
+			c.height = h;
 		}
 
 		// initial update		
-		setCanvasSize(canvas, canvas.offsetWidth, canvas.offsetHeight);
+		setCanvasSize(canvas, canvasContainer.offsetWidth, canvasContainer.offsetHeight);
 
 		const canvasSync = () => {
 			const c = document.querySelector('#canvas') as HTMLCanvasElement;
@@ -263,12 +264,12 @@ const EdgeClassic = () => {
 			Module._I_WebSyncScreenSize();
 		};
 
-		const pointerLockChange = () => {			
-			const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;		
+		const pointerLockChange = () => {
+			const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;
 
-			Module._I_WebSetFullscreen(lock ? 1 : 0);			
+			Module._I_WebSetFullscreen(lock ? 1 : 0);
 
-			if (!lock)	 {				
+			if (!lock) {
 				Module._I_WebOpenGameMenu(1);
 			}
 		}
@@ -284,7 +285,7 @@ const EdgeClassic = () => {
 		});
 
 		canvas.addEventListener("webglcontextlost", function (e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
-		
+
 
 		let iwad = defaultIWad;
 		if (wadState.wadName !== iwad && wadState.isIWAD) {
@@ -301,7 +302,7 @@ const EdgeClassic = () => {
 		createEdgeModule({
 			edgePostInit: () => {
 				console.log("Post-Init!");
-				setState({ ...state, loading: false });				
+				setState({ ...state, loading: false });
 			},
 			onFullscreen: () => {
 				/*
@@ -344,9 +345,9 @@ const EdgeClassic = () => {
 					try {
 						await canvas.requestPointerLock();
 					} catch {
-						pointerLockChange();	
-					}	
-				}				
+						pointerLockChange();
+					}
+				}
 			});
 		});
 
@@ -358,21 +359,21 @@ const EdgeClassic = () => {
 	}, []);
 
 
-	return <div id="canvas-container" style={{ display: "flex", width: "100%", position: "relative" }}>
-		<canvas id="canvas" style={{ display: "block", width: "100%",  visibility: state.loading ? "hidden" : "visible" }} />		
-		{!!state.loading && <div style={{position:"absolute", display:"flex", width:"100%", height: "100%", justifyContent: "center", alignItems: "center"}}>
+	return <div id="canvas-container" style={{ display: "flex", width: "100%", height: "100%", position: "relative" }}>
+		<canvas id="canvas" style={{ visibility: state.loading ? "hidden" : "visible" }} />
+		{!!state.loading && <div style={{ position: "absolute", display: "flex", width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }}>
 			<div class={style.loading}>
-			<span style="--i:1">L</span>
-			<span style="--i:2">O</span>
-			<span style="--i:3">A</span>
-			<span style="--i:4">D</span>
-			<span style="--i:5">I</span>
-			<span style="--i:6">N</span>
-			<span style="--i:7">G</span>
-			<span style="--i:8">.</span>
-			<span style="--i:9">.</span>
-			<span style="--i:10">.</span>
-		</div>
+				<span style="--i:1">L</span>
+				<span style="--i:2">O</span>
+				<span style="--i:3">A</span>
+				<span style="--i:4">D</span>
+				<span style="--i:5">I</span>
+				<span style="--i:6">N</span>
+				<span style="--i:7">G</span>
+				<span style="--i:8">.</span>
+				<span style="--i:9">.</span>
+				<span style="--i:10">.</span>
+			</div>
 		</div>}
 
 	</div>
