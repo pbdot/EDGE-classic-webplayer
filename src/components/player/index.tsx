@@ -159,19 +159,17 @@ const projects: Project[] = [
 const WadChooser = () => {
 
 	const pelements = projects.map(p => {
-		return <a href={p.link} target="_blank" style="display:flex;flex:1;flex-direction:column;height:100%;align-items:flex-end;">
+		return <a href={p.link} target="_blank" style="display:flex;flex:1;flex-direction:column;height:100%;align-items:flex-end">
 			<div style={{ display: "flex", flex: 0 }}>
 				<div style={{ paddingTop: 12, paddingBottom: 4, fontSize: 14, whiteSpace: "pre", fontWeight: "normal" }}>{p.name}</div>
 			</div>
 			<div style={{ display: "flex", position: "relative", flexGrow: 1, width: "100%" }} >
-				<img style="width:100%;height:100%; object-fit:cover;position:absolute;top:0;left:0" src={p.image} />
+				<img style="width:100%;height:100%; object-fit:cover;position:scale-down;top:0;left:0" src={p.image} />
 			</div>
-		</a>
-
-		//
+		</a>		
 	});
 
-	return <div style={{ display: "flex", width: "100%", maxHeight: "1080px", padding: 24, paddingLeft: 42 }}>
+	return <div style={{ display: "flex", width: "100%", maxWidth: "1440px", padding: 24, paddingLeft: 42 }}>
 		<div style={{ display: "flex", flexGrow: 1 }}>
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
@@ -221,7 +219,7 @@ const WadChooser = () => {
 			<div style={{ display: "flex", flex: "0 0 24px", position: "relative" }}>
 				<div style={{ position: "absolute", fontSize: 18, fontWeight: 400, whiteSpace: "pre" }}>Suggested Projects</div>
 			</div>
-			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column", justifyContent: "start" }}>
+			<div style={{ display: "flex", flexShrink: 0, flexGrow: 1, flexDirection: "column" }}>
 				{pelements}
 			</div>
 		</div>
@@ -245,9 +243,46 @@ const EdgeClassic = () => {
 			throw "Unable to get canvas";
 		}
 
-		canvas.addEventListener("webglcontextlost", function (e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
+		const setCanvasSize = (c: HTMLCanvasElement, w:number, h: number) => {	
+			c.style.width = `${w}px`;
+			c.style.height = `${h}px`;
+			c.width = w;
+			c.height = h;	
+		}
 
+		// initial update
 		console.log("Initial canvas", Math.ceil(canvas.offsetWidth), Math.ceil(canvas.offsetHeight));
+		setCanvasSize(canvas, canvas.offsetWidth, canvas.offsetHeight);
+
+		const canvasSync = () => {
+			const c = document.querySelector('#canvas') as HTMLCanvasElement;
+			const container = document.querySelector('#canvas-container') as HTMLDivElement;
+			setCanvasSize(c, container.offsetWidth, container.offsetHeight);
+			Module._I_WebSyncScreenSize();
+		};
+
+		const pointerLockChange = (ev) => {			
+			const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;		
+
+			Module._I_WebSetFullscreen(lock);			
+
+			if (!lock)	 {				
+				Module._I_WebOpenGameMenu(1);
+			}
+		}
+
+		document.addEventListener("pointerlockchange", pointerLockChange, false);
+
+		let doSyncTimeout;
+		window.addEventListener("resize", (ev) => {
+
+			clearTimeout(doSyncTimeout);
+			doSyncTimeout = setTimeout(canvasSync, 250);
+
+		});
+
+		canvas.addEventListener("webglcontextlost", function (e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
+		
 
 		let iwad = defaultIWad;
 		if (wadState.wadName !== iwad && wadState.isIWAD) {
@@ -312,27 +347,27 @@ const EdgeClassic = () => {
 	}, []);
 
 
-	return <div style={{ display: "flex", width: "100%", height: "100%", flexFlow: "column", position: "relative" }}>
-		<div class={style.edgeclassic}>
-			<div style={{ display: "flex", width: "100%", flexFlow: "column", justifyContent: state.loading ? "center" : "top", alignItems: "center", position: "relative" }}>
-				<canvas id="canvas" style={{ visibility: state.loading ? "hidden" : "visible" }} />
-				{!!state.loading && <div class={style.loading} style={{ position: "absolute" }}>
-					<span style="--i:1">L</span>
-					<span style="--i:2">O</span>
-					<span style="--i:3">A</span>
-					<span style="--i:4">D</span>
-					<span style="--i:5">I</span>
-					<span style="--i:6">N</span>
-					<span style="--i:7">G</span>
-					<span style="--i:8">.</span>
-					<span style="--i:9">.</span>
-					<span style="--i:10">.</span>
-				</div>}
-			</div>
+	return <div id="canvas-container" style={{ display: "flex", width: "100%", position: "relative" }}>
+		<canvas id="canvas" style={{ display: "block", width: "100%",  visibility: state.loading ? "hidden" : "visible" }} />		
+		{!!state.loading && <div style={{position:"absolute", display:"flex", width:"100%", height: "100%", justifyContent: "center", alignItems: "center"}}>
+			<div class={style.loading}>
+			<span style="--i:1">L</span>
+			<span style="--i:2">O</span>
+			<span style="--i:3">A</span>
+			<span style="--i:4">D</span>
+			<span style="--i:5">I</span>
+			<span style="--i:6">N</span>
+			<span style="--i:7">G</span>
+			<span style="--i:8">.</span>
+			<span style="--i:9">.</span>
+			<span style="--i:10">.</span>
 		</div>
-		{!state.loading && <PlayerControls />}
+		</div>}
+
 	</div>
 }
+// floating player controls, not currently used
+// {!state.loading && <PlayerControls />} 
 
 const PlayerControls = () => {
 	const [fullscreen, setFullscreen] = useState(false);
@@ -350,7 +385,7 @@ const Player = () => {
 	const wadState = wadHandler.wadState.value;
 
 	return (
-		<div class={style.player}>
+		<div style={{ display: "flex", width: "100%", justifyContent: "center" }}>
 			{!wadState.wadName && <WadChooser />}
 			{!!wadState.wadName && <EdgeClassic />}
 		</div>
