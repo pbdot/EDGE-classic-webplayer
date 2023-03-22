@@ -244,14 +244,16 @@ const EdgeClassic = () => {
 		}
 
 		const setCanvasSize = (c: HTMLCanvasElement, w:number, h: number) => {	
+			w = Math.floor(w);
+			h = Math.floor(h);
+			console.log("Setting canvas size", w, h);
 			c.style.width = `${w}px`;
 			c.style.height = `${h}px`;
 			c.width = w;
-			c.height = h;	
+			c.height = h;				
 		}
 
-		// initial update
-		console.log("Initial canvas", Math.ceil(canvas.offsetWidth), Math.ceil(canvas.offsetHeight));
+		// initial update		
 		setCanvasSize(canvas, canvas.offsetWidth, canvas.offsetHeight);
 
 		const canvasSync = () => {
@@ -261,10 +263,10 @@ const EdgeClassic = () => {
 			Module._I_WebSyncScreenSize();
 		};
 
-		const pointerLockChange = (ev) => {			
+		const pointerLockChange = () => {			
 			const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;		
 
-			Module._I_WebSetFullscreen(lock);			
+			Module._I_WebSetFullscreen(lock ? 1 : 0);			
 
 			if (!lock)	 {				
 				Module._I_WebOpenGameMenu(1);
@@ -299,14 +301,16 @@ const EdgeClassic = () => {
 		createEdgeModule({
 			edgePostInit: () => {
 				console.log("Post-Init!");
-				setState({ ...state, loading: false });
+				setState({ ...state, loading: false });				
 			},
 			onFullscreen: () => {
+				/*
 				console.log("On fullscreen");
 				const elements = document.querySelectorAll(".playercontrols");
 				elements?.forEach(e => {
 					(e as any).style.display = "flex";
 				});
+				*/
 			},
 			preEdgeSyncFS: () => {
 			},
@@ -335,7 +339,14 @@ const EdgeClassic = () => {
 			globalThis.Module = module;
 			module.canvas = canvas;
 			canvas.addEventListener("click", async () => {
-				await canvas.requestPointerLock();
+				const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;
+				if (!lock) {
+					try {
+						await canvas.requestPointerLock();
+					} catch {
+						pointerLockChange();	
+					}	
+				}				
 			});
 		});
 
