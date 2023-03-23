@@ -241,9 +241,13 @@ const EdgeClassic = () => {
 
 		Module._I_WebSetFullscreen(lock ? 1 : 0);
 
+		/*
+		// It feels good to open the menu when releasing pointer lock
+		// though, it makes the interaction tricky to close the menu
 		if (!lock) {
 			Module._I_WebOpenGameMenu(1);
 		} 
+		*/
 	}
 
 	useEffect(() => {
