@@ -1,7 +1,7 @@
 import { Signal, signal } from '@preact/signals';
 import { h } from 'preact';
 import style from './style.css';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import createEdgeModule from '../../edge-classic';
 
 const defaultIWad = "freedoom2.wad"
@@ -227,52 +227,57 @@ const WadChooser = () => {
 
 }
 
-
 const EdgeClassic = () => {
 
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const canvasContainerRef = useRef<HTMLDivElement>(null);
 	const [state, setState] = useState<{ loading: boolean }>({ loading: true });
 	const wadState = WadHandler.singleton.wadState.value;
 
 
+	const pointerLockChange = () => {
+		const canvas = canvasRef?.current;
+		const lock = canvas === document.pointerLockElement;
+
+		Module._I_WebSetFullscreen(lock ? 1 : 0);
+
+		if (!lock) {
+			Module._I_WebOpenGameMenu(1);
+		} 
+	}
+
 	useEffect(() => {
+
+		const canvas = canvasRef?.current;
+		const canvasContainer = canvasContainerRef?.current;
 
 		const wadName = wadState.wadName!;
 
-		const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
-		const canvasContainer = document.querySelector('#canvas-container') as HTMLDivElement;
+		if (!canvasContainer) {
+			throw "Unable to get canvas container";
+		}
+
 		if (!canvas) {
 			throw "Unable to get canvas";
 		}
 
-		const setCanvasSize = (c: HTMLCanvasElement, w: number, h: number) => {
-			w = Math.floor(w);
-			h = Math.floor(h);
+		const syncCanvasSize = () => {
+			const w = Math.floor(canvasContainer.offsetWidth);
+			const h = Math.floor(canvasContainer.offsetHeight);
 			console.log("Setting canvas size", w, h);
-			c.style.width = `${w}px`;
-			c.style.height = `${h}px`;
-			c.width = w;
-			c.height = h;
+			canvas.style.width = `${w}px`;
+			canvas.style.height = `${h}px`;
+			canvas.width = w;
+			canvas.height = h;
 		}
 
 		// initial update		
-		setCanvasSize(canvas, canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+		syncCanvasSize();
 
 		const canvasSync = () => {
-			const c = document.querySelector('#canvas') as HTMLCanvasElement;
-			const container = document.querySelector('#canvas-container') as HTMLDivElement;
-			setCanvasSize(c, container.offsetWidth, container.offsetHeight);
+			syncCanvasSize();
 			Module._I_WebSyncScreenSize();
 		};
-
-		const pointerLockChange = () => {
-			const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;
-
-			Module._I_WebSetFullscreen(lock ? 1 : 0);
-
-			if (!lock) {
-				Module._I_WebOpenGameMenu(1);
-			}
-		}
 
 		document.addEventListener("pointerlockchange", pointerLockChange, false);
 
@@ -302,6 +307,7 @@ const EdgeClassic = () => {
 		createEdgeModule({
 			edgePostInit: () => {
 				console.log("Post-Init!");
+				Module._I_WebOpenGameMenu(1);
 				setState({ ...state, loading: false });
 			},
 			onFullscreen: () => {
@@ -339,16 +345,6 @@ const EdgeClassic = () => {
 		}).then(module => {
 			globalThis.Module = module;
 			module.canvas = canvas;
-			canvas.addEventListener("click", async () => {
-				const lock = document.querySelector('#canvas') as HTMLCanvasElement === document.pointerLockElement;
-				if (!lock) {
-					try {
-						await canvas.requestPointerLock();
-					} catch {
-						pointerLockChange();
-					}
-				}
-			});
 		});
 
 
@@ -359,8 +355,19 @@ const EdgeClassic = () => {
 	}, []);
 
 
-	return <div id="canvas-container" style={{ display: "flex", width: "100%", height: "100%", position: "relative" }}>
-		<canvas id="canvas" style={{ visibility: state.loading ? "hidden" : "visible" }} />
+	return <div id="canvas-container" ref={canvasContainerRef} style={{ display: "flex", width: "100%", height: "100%", position: "relative" }}>
+		<canvas id="canvas" ref={canvasRef} style={{ visibility: state.loading ? "hidden" : "visible" }}
+			onClick={async (ev) => {
+				const lock = canvasRef.current === document.pointerLockElement;
+				if (!lock) {
+					try {
+						await canvasRef.current?.requestPointerLock();
+					} catch(err) {
+						console.error(err);						
+					}
+				}
+			}} />
+
 		{!!state.loading && <div style={{ position: "absolute", display: "flex", width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }}>
 			<div class={style.loading}>
 				<span style="--i:1">L</span>
