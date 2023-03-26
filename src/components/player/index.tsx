@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import createEdgeModule from '../../edge-classic';
 
 const defaultIWad = "freedoom2.wad"
+const deathmatchIWad = "freedm.wad";
 
 type PlayerConfig = {
 	indexDBName: string;
@@ -181,13 +182,19 @@ const WadChooser = () => {
 					</div>
 
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:256px;padding:12px" onClick={() => {
+						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
 							WadHandler.singleton.setWad(defaultIWad, true)
 						}}>Play Freedoom</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:256px;padding:12px" onClick={() => {
+						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+							WadHandler.singleton.setWad(deathmatchIWad, true)
+						}}>Play Bot Death Match</button>
+					</div>
+					<div style={{ paddingTop: 24 }} />
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
 							document.getElementById('getWadFile').click()
 						}}>Choose Wad</button>
 					</div>
@@ -297,11 +304,19 @@ const EdgeClassic = () => {
 
 
 		let iwad = defaultIWad;
+		if (wadState.wadName === deathmatchIWad) {
+			iwad = deathmatchIWad;
+		}
+		
 		if (wadState.wadName !== iwad && wadState.isIWAD) {
 			iwad = `edge-classic/${wadName}`;
 		}
 
 		const args = ["-home", "edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwad];
+
+		if (iwad === deathmatchIWad) {
+			args.push(...["-deathmatch", "1", "-warp", "map03", "-nomonsters", "-bots", "2"])
+		}
 
 		if (!wadState.isIWAD) {
 			args.push("-file")
@@ -311,7 +326,11 @@ const EdgeClassic = () => {
 		createEdgeModule({
 			edgePostInit: () => {
 				console.log("Post-Init!");
-				Module._I_WebOpenGameMenu(1);
+				// jump 
+				if (!args.find( a => a.startsWith("-warp"))) {
+					Module._I_WebOpenGameMenu(1);
+				}
+					
 				setState({ ...state, loading: false });
 			},
 			onFullscreen: () => {
@@ -366,8 +385,8 @@ const EdgeClassic = () => {
 				if (!lock) {
 					try {
 						await canvasRef.current?.requestPointerLock();
-					} catch(err) {
-						console.error(err);						
+					} catch (err) {
+						console.error(err);
 					}
 				}
 			}} />
