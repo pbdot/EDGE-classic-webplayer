@@ -175,9 +175,7 @@ const WadChooser = () => {
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
 					<div style={{ display: "flex" }}>
-						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24 }}>EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.
-							<p>The latest release can be downloaded from <a href="https://edge-classic.github.io/index.html" target="_blank">https://edge-classic.github.io</a> </p>
-							<p>Play EDGE-Classic in your browser by selecting an option below:</p>
+						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24, width: 800 }}>Play EDGE-Classic in your browser by selecting an option below
 						</div>
 					</div>
 
@@ -315,7 +313,7 @@ const EdgeClassic = () => {
 		const args = ["-home", "edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwad];
 
 		if (iwad === deathmatchIWad) {
-			args.push(...["-deathmatch", "1", "-warp", "map03", "-nomonsters", "-bots", "2"])
+			args.push(...["-deathmatch", "1", "-nomonsters", "-skill", "2", "-bots", "1", "-warp", "map03"])
 		}
 
 		if (!wadState.isIWAD) {
