@@ -175,26 +175,26 @@ const WadChooser = () => {
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
 					<div style={{ display: "flex" }}>
-						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24, width: 800 }}>Play EDGE-Classic in your browser by selecting an option below
+						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24, width: 800 }}>Play EDGE-Classic in your browser by selecting an option below:
 						</div>
 					</div>
 
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							WadHandler.singleton.setWad(defaultIWad, true)
 						}}>Play Freedoom</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							WadHandler.singleton.setWad(deathmatchIWad, true)
 						}}>Play Bot Death Match</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							document.getElementById('getWadFile').click()
-						}}>Choose Wad</button>
+						}}>Choose Wad, EPK, or Zip</button>
 					</div>
 
 				</div>
@@ -203,14 +203,15 @@ const WadChooser = () => {
 					const files = (e.target as any).files as File[];
 					if (files.length !== 1) {
 						e.preventDefault();
-						alert("Please select a single wad file");
+						alert("Please select a single wad, epk, or zip file");
 						return;
 					}
 
 					const file = files[0];
-					if (!file.name.toLowerCase().endsWith(".wad")) {
+					const check = file.name.toLowerCase();
+					if (!check.endsWith(".wad") && !check.endsWith(".zip") && !check.endsWith(".epk")) {
 						e.preventDefault();
-						alert("Please select a single wad file");
+						alert("Please select a wad, epk, or zip file");
 						return;
 					}
 
