@@ -245,7 +245,8 @@ const EdgeClassic = () => {
 		const canvas = canvasRef?.current;
 		const lock = canvas === document.pointerLockElement;
 
-		Module._I_WebSetFullscreen(lock ? 1 : 0);
+		// disabled for embedded classic site
+		//Module._I_WebSetFullscreen(lock ? 1 : 0);
 
 		/*
 		// It feels good to open the menu when releasing pointer lock
