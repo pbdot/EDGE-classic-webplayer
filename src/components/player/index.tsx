@@ -3,6 +3,7 @@ import { h } from 'preact';
 import style from './style.css';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import createEdgeModule from '../../edge-classic';
+import LicenseModal from '../licenses';
 
 const defaultIWad = "freedoom2.wad"
 const deathmatchIWad = "freedm.wad";
@@ -159,6 +160,8 @@ const projects: Project[] = [
 
 const WadChooser = () => {
 
+	const [showLicense, setShowLicense] = useState(false);
+
 	const pelements = projects.map(p => {
 		return <a href={p.link} target="_blank" style="display:flex;flex:1;flex-direction:column;height:100%;align-items:flex-end">
 			<div style={{ display: "flex", flex: 0 }}>
@@ -171,6 +174,7 @@ const WadChooser = () => {
 	});
 
 	return <div style={{ display: "flex", width: "100%", maxWidth: "1440px", padding: 24, paddingLeft: 42 }}>
+		{showLicense && <LicenseModal onClose={() => setShowLicense(false)} />}
 		<div style={{ display: "flex", flexGrow: 1 }}>
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
@@ -196,7 +200,12 @@ const WadChooser = () => {
 							document.getElementById('getWadFile').click()
 						}}>Choose Wad, EPK, or Zip</button>
 					</div>
-
+					<div style={{ paddingTop: 128 }} />
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
+							setShowLicense(true);
+						}}>Show Licenses</button>
+					</div>
 				</div>
 
 				<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
@@ -307,7 +316,7 @@ const EdgeClassic = () => {
 		if (wadState.wadName === deathmatchIWad) {
 			iwad = deathmatchIWad;
 		}
-		
+
 		if (wadState.wadName !== iwad && wadState.isIWAD) {
 			iwad = `edge-classic/${wadName}`;
 		}
@@ -327,10 +336,10 @@ const EdgeClassic = () => {
 			edgePostInit: () => {
 				console.log("Post-Init!");
 				// jump 
-				if (!args.find( a => a.startsWith("-warp"))) {
+				if (!args.find(a => a.startsWith("-warp"))) {
 					Module._I_WebOpenGameMenu(1);
 				}
-					
+
 				setState({ ...state, loading: false });
 			},
 			onFullscreen: () => {
