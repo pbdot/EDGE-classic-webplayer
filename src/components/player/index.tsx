@@ -3,6 +3,7 @@ import { h } from 'preact';
 import style from './style.css';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import createEdgeModule from '../../edge-classic';
+import LicenseModal from '../licenses';
 
 const defaultIWad = "freedoom2.wad"
 const deathmatchIWad = "freedm.wad";
@@ -159,6 +160,8 @@ const projects: Project[] = [
 
 const WadChooser = () => {
 
+	const [showLicense, setShowLicense] = useState(false);
+
 	const pelements = projects.map(p => {
 		return <a href={p.link} target="_blank" style="display:flex;flex:1;flex-direction:column;height:100%;align-items:flex-end">
 			<div style={{ display: "flex", flex: 0 }}>
@@ -171,48 +174,53 @@ const WadChooser = () => {
 	});
 
 	return <div style={{ display: "flex", width: "100%", maxWidth: "1440px", padding: 24, paddingLeft: 42 }}>
+		{showLicense && <LicenseModal onClose={() => setShowLicense(false)} />}
 		<div style={{ display: "flex", flexGrow: 1 }}>
 			<div style={{ display: "flex", width: "80%" }}>
 				<div style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
 					<div style={{ display: "flex" }}>
-						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24 }}>EDGE-Classic is a Doom source port that provides advanced features, ease of modding, and attractive visuals while keeping hardware requirements very modest.
-							<p>The latest release can be downloaded from <a href="https://edge-classic.github.io/index.html" target="_blank">https://edge-classic.github.io</a> </p>
-							<p>Play EDGE-Classic in your browser by selecting an option below:</p>
+						<div style={{ fontSize: 18, fontWeight: "normal", paddingBottom: 24, width: 800 }}>Play EDGE-Classic in your browser by selecting an option below:
 						</div>
 					</div>
 
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							WadHandler.singleton.setWad(defaultIWad, true)
 						}}>Play Freedoom</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							WadHandler.singleton.setWad(deathmatchIWad, true)
 						}}>Play Bot Death Match</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
-						<button style="font-size:24px;width:292px;height:64px;padding:12px" onClick={() => {
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							document.getElementById('getWadFile').click()
-						}}>Choose Wad</button>
+						}}>Choose Wad, EPK, or Zip</button>
 					</div>
-
+					<div style={{ paddingTop: 128 }} />
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
+							setShowLicense(true);
+						}}>Show Licenses</button>
+					</div>
 				</div>
 
 				<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
 					const files = (e.target as any).files as File[];
 					if (files.length !== 1) {
 						e.preventDefault();
-						alert("Please select a single wad file");
+						alert("Please select a single wad, epk, or zip file");
 						return;
 					}
 
 					const file = files[0];
-					if (!file.name.toLowerCase().endsWith(".wad")) {
+					const check = file.name.toLowerCase();
+					if (!check.endsWith(".wad") && !check.endsWith(".zip") && !check.endsWith(".epk")) {
 						e.preventDefault();
-						alert("Please select a single wad file");
+						alert("Please select a wad, epk, or zip file");
 						return;
 					}
 
@@ -246,7 +254,8 @@ const EdgeClassic = () => {
 		const canvas = canvasRef?.current;
 		const lock = canvas === document.pointerLockElement;
 
-		Module._I_WebSetFullscreen(lock ? 1 : 0);
+		// disabled for embedded classic site
+		//Module._I_WebSetFullscreen(lock ? 1 : 0);
 
 		/*
 		// It feels good to open the menu when releasing pointer lock
@@ -307,7 +316,7 @@ const EdgeClassic = () => {
 		if (wadState.wadName === deathmatchIWad) {
 			iwad = deathmatchIWad;
 		}
-		
+
 		if (wadState.wadName !== iwad && wadState.isIWAD) {
 			iwad = `edge-classic/${wadName}`;
 		}
@@ -315,7 +324,7 @@ const EdgeClassic = () => {
 		const args = ["-home", "edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwad];
 
 		if (iwad === deathmatchIWad) {
-			args.push(...["-deathmatch", "1", "-warp", "map03", "-nomonsters", "-bots", "2"])
+			args.push(...["-deathmatch", "1", "-nomonsters", "-skill", "2", "-bots", "1", "-warp", "map03"])
 		}
 
 		if (!wadState.isIWAD) {
@@ -327,10 +336,10 @@ const EdgeClassic = () => {
 			edgePostInit: () => {
 				console.log("Post-Init!");
 				// jump 
-				if (!args.find( a => a.startsWith("-warp"))) {
+				if (!args.find(a => a.startsWith("-warp"))) {
 					Module._I_WebOpenGameMenu(1);
 				}
-					
+
 				setState({ ...state, loading: false });
 			},
 			onFullscreen: () => {
