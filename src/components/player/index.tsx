@@ -238,9 +238,9 @@ const WadChooser = () => {
 
 						const value = (ev?.target?.value?.length ? ev?.target?.value : undefined)?.trim().replace("\n", " ");
 						if (value?.length) {
-							document.cookie = `customCommandLineCookie=${value}`;
+							document.cookie = `customCommandLineCookie=${value}; SameSite=None; Secure`;
 						} else {
-							document.cookie = `customCommandLineCookie=;`;
+							document.cookie = `customCommandLineCookie=; SameSite=None; Secure`;
 						}
 
 					}}>{getCookie("customCommandLineCookie")?.trim() ?? ""}</textarea>
