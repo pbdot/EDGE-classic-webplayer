@@ -322,7 +322,12 @@ const EdgeClassic = () => {
 		const canvas = canvasRef?.current;
 		const canvasContainer = canvasContainerRef?.current;
 
-		const iwad = wadState?.find(w => w.isIWAD);
+		let iwad = wadState?.find(w => w.isIWAD);
+
+		if (!iwad) {
+			iwad = { wadName: defaultIWad, isIWAD: true };
+		}
+		
 		console.log("WadState", wadState);
 
 		/*
