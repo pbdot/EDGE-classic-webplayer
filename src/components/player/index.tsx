@@ -22,9 +22,16 @@ const config: PlayerConfig = {
 	indexDBName: '/edge-classic'
 }
 
-function getCookie(cname:string):string {
+function getCookie(cname: string): string {
 	let name = cname + "=";
-	let ca = document.cookie.split(';');
+	let ca;
+	// prerender guard
+	if (typeof window !== 'undefined') {
+		ca = document.cookie.split(';');
+	}
+	if (!ca) {
+		return "";
+	}
 	for (let i = 0; i < ca.length; i++) {
 		let c = ca[i];
 		while (c.charAt(0) == ' ') {
