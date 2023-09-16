@@ -22,6 +22,21 @@ const config: PlayerConfig = {
 	indexDBName: '/edge-classic'
 }
 
+function getCookie(cname:string):string {
+	let name = cname + "=";
+	let ca = document.cookie.split(';');
+	for (let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+}
+
 class WadHandler {
 
 	constructor(config: PlayerConfig) {
@@ -34,67 +49,77 @@ class WadHandler {
 		console.trace();
 	}
 
-	setWad(wadName: string, isIWAD?: boolean) {
-		this.wadState.value = { wadName: wadName, isIWAD: isIWAD };
+	setWads(wads: WadState[] | undefined) {
+		this.wadState.value = wads;
 	}
 
-	async uploadWad(file: File) {
+	async uploadWads(files: File[]) {
 
-		let database: IDBDatabase | undefined;
+		const wads: WadState[] = [];
 
-		try {
-			database = await this.openDatabase();
-			if (!database) {
-				this.error("Unable to open database")
+		for (let i = 0; i < files.length; i++) {
+
+			const file = files[i];
+
+			let database: IDBDatabase | undefined;
+
+			try {
+				database = await this.openDatabase();
+				if (!database) {
+					this.error("Unable to open database")
+					return;
+				}
+			} catch (e) {
+				this.error(e);
+				database?.close();
 				return;
 			}
-		} catch (e) {
-			this.error(e);
-			database?.close();
-			return;
-		}
 
-		const upload = new Promise<{ wadName: string, iwad: boolean }>((resolve, reject) => {
+			const upload = new Promise<WadState>((resolve, reject) => {
 
-			var reader = new FileReader();
-			reader.readAsArrayBuffer(file);
+				var reader = new FileReader();
+				reader.readAsArrayBuffer(file);
 
-			reader.onload = (e) => {
+				reader.onload = (e) => {
 
-				const bits = e.target.result;
-				const contents = new Uint8Array(bits as ArrayBuffer);
+					const bits = e.target.result;
+					const contents = new Uint8Array(bits as ArrayBuffer);
 
-				const iwad = contents[0] === 73;
+					const iwad = contents[0] === 73;
 
-				const trans = database.transaction(['FILE_DATA'], 'readwrite');
-				const path = `${this.config.indexDBName}/${file.name}`;
-				const addReq = trans.objectStore('FILE_DATA').put({ timestamp: new Date(), mode: 33206, contents: contents }, path);
+					const trans = database.transaction(['FILE_DATA'], 'readwrite');
+					const path = `${this.config.indexDBName}/${file.name}`;
+					const addReq = trans.objectStore('FILE_DATA').put({ timestamp: new Date(), mode: 33206, contents: contents }, path);
 
-				addReq.onerror = (e) => {
-					reject("Error storing wad data");
+					addReq.onerror = (e) => {
+						reject("Error storing wad data");
+					}
+
+					trans.oncomplete = (e) => {
+						resolve({ wadName: file.name, isIWAD: iwad });
+					}
 				}
 
-				trans.oncomplete = (e) => {
-					resolve({ wadName: file.name, iwad: iwad });
+				reader.onerror = (e) => {
+					reject("Error reading wad");
 				}
+
+			});
+
+			try {
+				const wad = await upload;
+				database?.close();
+				database = undefined;
+				wads.push(wad)
+			} catch (e) {
+				this.error(e);
+			} finally {
+				database?.close();
 			}
 
-			reader.onerror = (e) => {
-				reject("Error reading wad");
-			}
-
-		});
-
-		try {
-			const wad = await upload;
-			database?.close();
-			database = undefined;
-			this.setWad(wad.wadName, wad.iwad);
-		} catch (e) {
-			this.error(e);
-		} finally {
-			database?.close();
 		}
+
+		this.setWads(wads.length ? wads : undefined);
 
 	}
 
@@ -131,7 +156,7 @@ class WadHandler {
 		});
 	}
 
-	wadState: Signal<WadState> = signal({});
+	wadState: Signal<WadState[] | undefined> = signal(undefined);
 
 	config: PlayerConfig;
 
@@ -185,21 +210,35 @@ const WadChooser = () => {
 
 					<div style={{ display: "flex", alignItems: "center" }}>
 						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
-							WadHandler.singleton.setWad(defaultIWad, true)
+							WadHandler.singleton.setWads([{ wadName: defaultIWad, isIWAD: true }])
 						}}>Play Freedoom</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
 						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
-							WadHandler.singleton.setWad(deathmatchIWad, true)
+							WadHandler.singleton.setWads([{ wadName: deathmatchIWad, isIWAD: true }])
 						}}>Play Bot Death Match</button>
 					</div>
 					<div style={{ paddingTop: 24 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
 						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
 							document.getElementById('getWadFile').click()
-						}}>Choose Wad, EPK, or Zip</button>
+						}}>Play Wad, EPK, or Zip files</button>
 					</div>
+					<div style={{ paddingTop: 24 }} />
+
+					<textarea style="font-size:12px;width:292px;height:48px" placeholder="Enter custom command line" spellcheck={false} onChange={(ev: any) => {
+
+						const value = (ev?.target?.value?.length ? ev?.target?.value : undefined)?.trim().replace("\n", " ");
+						if (value?.length) {
+							document.cookie = `customCommandLineCookie=${value}`;
+						} else {
+							document.cookie = `customCommandLineCookie=;`;
+						}
+
+					}}>{getCookie("customCommandLineCookie")?.trim() ?? ""}</textarea>
+
+
 					<div style={{ paddingTop: 128 }} />
 					<div style={{ display: "flex", alignItems: "center" }}>
 						<button style="font-size:18px;width:292px;height:48px;padding:12px" onClick={() => {
@@ -208,24 +247,29 @@ const WadChooser = () => {
 					</div>
 				</div>
 
-				<input id="getWadFile" style="display:none" type="file" onChange={(e) => {
-					const files = (e.target as any).files as File[];
-					if (files.length !== 1) {
+				<input id="getWadFile" style="display:none" type="file" multiple onChange={(e) => {
+					const files = Array.from((e.target as any).files as File[]);
+					if (files.length === 0) {
 						e.preventDefault();
-						alert("Please select a single wad, epk, or zip file");
 						return;
 					}
 
-					const file = files[0];
-					const check = file.name.toLowerCase();
-					if (!check.endsWith(".wad") && !check.endsWith(".zip") && !check.endsWith(".epk")) {
+					const badFile = files.find(f => {
+						const check = f.name.toLowerCase();
+						if (!check.endsWith(".wad") && !check.endsWith(".zip") && !check.endsWith(".epk") && !check.endsWith(".7z")) {
+							return true;
+						}
+						return false;
+					})
+
+					if (badFile) {
 						e.preventDefault();
-						alert("Please select a wad, epk, or zip file");
+						alert(`Please select wad, epk, or zip files, ${badFile.name} is invalid`);
 						return;
 					}
 
 					const wadHandler = WadHandler.singleton;
-					wadHandler.uploadWad(file);
+					wadHandler.uploadWads(files);
 
 				}} />
 			</div>
@@ -262,7 +306,7 @@ const EdgeClassic = () => {
 		// though, it makes the interaction tricky to close the menu
 		if (!lock) {
 			Module._I_WebOpenGameMenu(1);
-		} 
+		}
 		*/
 	}
 
@@ -271,7 +315,24 @@ const EdgeClassic = () => {
 		const canvas = canvasRef?.current;
 		const canvasContainer = canvasContainerRef?.current;
 
-		const wadName = wadState.wadName!;
+		const iwad = wadState?.find(w => w.isIWAD);
+		console.log("WadState", wadState);
+
+		/*
+		let iwad = defaultIWad;
+		if (wadState.wadName === deathmatchIWad) {
+			iwad = deathmatchIWad;
+		}
+
+		if (wadState.wadName !== iwad && wadState.isIWAD) {
+			iwad = `edge-classic/${wadName}`;
+		}
+		*/
+
+		if (!iwad) {
+			throw "Unable to get iwad";
+		}
+
 
 		if (!canvasContainer) {
 			throw "Unable to get canvas container";
@@ -291,7 +352,7 @@ const EdgeClassic = () => {
 			canvas.height = h;
 		}
 
-		// initial update		
+		// initial update
 		syncCanvasSize();
 
 		const canvasSync = () => {
@@ -311,31 +372,36 @@ const EdgeClassic = () => {
 
 		canvas.addEventListener("webglcontextlost", function (e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
 
-
-		let iwad = defaultIWad;
-		if (wadState.wadName === deathmatchIWad) {
-			iwad = deathmatchIWad;
+		let iwadPath = iwad.wadName!;
+		if (iwadPath !== defaultIWad && iwadPath !== deathmatchIWad) {
+			iwadPath = `edge-classic/${iwadPath}`;
 		}
 
-		if (wadState.wadName !== iwad && wadState.isIWAD) {
-			iwad = `edge-classic/${wadName}`;
-		}
+		const args = ["-home", "edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwadPath];
 
-		const args = ["-home", "edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwad];
-
-		if (iwad === deathmatchIWad) {
-			args.push(...["-deathmatch", "1", "-nomonsters", "-skill", "2", "-bots", "1", "-warp", "map03"])
-		}
-
-		if (!wadState.isIWAD) {
+		wadState.forEach(w => {
+			if (w.isIWAD) {
+				return;
+			}
 			args.push("-file")
-			args.push(`edge-classic/${wadName}`);
+			args.push(`edge-classic/${w.wadName}`);
+		})
+
+		let customCommandLine = getCookie("customCommandLineCookie");
+		if (!customCommandLine?.length) {
+			if (iwad.wadName === deathmatchIWad) {
+				args.push(...["-deathmatch", "1", "-nomonsters", "-skill", "2", "-bots", "1", "-warp", "map03"])
+			}
+		} else {
+			args.push(...customCommandLine.split(" "));
 		}
+
+
 
 		createEdgeModule({
 			edgePostInit: () => {
 				console.log("Post-Init!");
-				// jump 
+				// jump
 				if (!args.find(a => a.startsWith("-warp"))) {
 					Module._I_WebOpenGameMenu(1);
 				}
@@ -418,7 +484,7 @@ const EdgeClassic = () => {
 	</div>
 }
 // floating player controls, not currently used
-// {!state.loading && <PlayerControls />} 
+// {!state.loading && <PlayerControls />}
 
 const PlayerControls = () => {
 	const [fullscreen, setFullscreen] = useState(false);
@@ -437,8 +503,8 @@ const Player = () => {
 
 	return (
 		<div style={{ display: "flex", width: "100%", justifyContent: "center" }}>
-			{!wadState.wadName && <WadChooser />}
-			{!!wadState.wadName && <EdgeClassic />}
+			{!wadState?.length && <WadChooser />}
+			{!!wadState?.length && <EdgeClassic />}
 		</div>
 	);
 };
