@@ -306,13 +306,13 @@ const EdgeClassic = () => {
 		const lock = canvas === document.pointerLockElement;
 
 		// disabled for embedded classic site
-		//Module._I_WebSetFullscreen(lock ? 1 : 0);
+		//Module._WebSetFullscreen(lock ? 1 : 0);
 
 		/*
 		// It feels good to open the menu when releasing pointer lock
 		// though, it makes the interaction tricky to close the menu
 		if (!lock) {
-			Module._I_WebOpenGameMenu(1);
+			Module._WebOpenGameMenu(1);
 		}
 		*/
 	}
@@ -369,7 +369,7 @@ const EdgeClassic = () => {
 
 		const canvasSync = () => {
 			syncCanvasSize();
-			Module._I_WebSyncScreenSize();
+			Module._WebSyncScreenSize();
 		};
 
 		document.addEventListener("pointerlockchange", pointerLockChange, false);
@@ -389,7 +389,7 @@ const EdgeClassic = () => {
 			iwadPath = `edge-classic/${iwadPath}`;
 		}
 
-		const args = ["-home", "edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwadPath];
+		const args = ["-home", "/edge-classic", "-windowed", "-width", canvas.offsetWidth.toString(), "-height", canvas.offsetHeight.toString(), "-iwad", iwadPath];
 
 		wadState.forEach(w => {
 			if (w.isIWAD) {
@@ -415,7 +415,7 @@ const EdgeClassic = () => {
 				console.log("Post-Init!");
 				// jump
 				if (!args.find(a => a.startsWith("-warp"))) {
-					Module._I_WebOpenGameMenu(1);
+					Module._WebOpenGameMenu(1);
 				}
 
 				setState({ ...state, loading: false });
@@ -503,7 +503,7 @@ const PlayerControls = () => {
 	return <div className="playercontrols" style={{ display: "flex", width: "100%", padding: "24px", zIndex: 1, position: "absolute" }}>
 		<div className="playercontrols" style={{ display: "flex", width: "100%" }} />
 		<div className="playercontrols" style={{ display: "flex", flexShrink: 1, paddingRight: "48px" }}>
-			<button style={{ opacity: 1 }} className="playercontrols" onClick={() => { Module._I_WebSetFullscreen(fullscreen ? 0 : 1, setFullscreen(!fullscreen)) }}>{fullscreen ? "Minimize" : "Maximize"}</button>
+			<button style={{ opacity: 1 }} className="playercontrols" onClick={() => { Module._WebSetFullscreen(fullscreen ? 0 : 1, setFullscreen(!fullscreen)) }}>{fullscreen ? "Minimize" : "Maximize"}</button>
 		</div>
 	</div>
 }
